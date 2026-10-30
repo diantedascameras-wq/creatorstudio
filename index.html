@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creator Studio para Marcas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Layout: palco fixo 1600×900 escalado para caber na janela; navegação por teclado, toque e botões. Identidade V4 Creator Squad, dark único. */
+  :root {
+    --red: #E50914;
+    --red-hot: #FF1A26;
+    --red-soft: #FF6B6B;
+    --wine: #7B0A14;
+    --bg: #0A0A0A;
+    --card: #111111;
+    --line: rgba(255,255,255,0.08);
+    --line-red: rgba(229,9,20,0.3);
+    --fg: #FFFFFF;
+    --fg-2: rgba(255,255,255,0.62);
+    --fg-3: rgba(255,255,255,0.36);
+    --font: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font);
+    -webkit-font-smoothing: antialiased; overflow: hidden;
+  }
+  * { box-sizing: border-box; }
+
+  /* ── Viewport ── */
+  .viewport { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
+  .stage {
+    width: 1600px; height: 900px; position: relative; flex: none;
+    transform-origin: center center; background: var(--bg); overflow: hidden;
+    border: 1px solid var(--line); border-radius: 10px;
+  }
+
+  /* orbs */
+  .orb { position: absolute; border-radius: 50%; filter: blur(110px); pointer-events: none; animation: drift 14s ease-in-out infinite alternate; }
+  .orb-a { width: 620px; height: 620px; background: radial-gradient(circle, var(--red), transparent 70%); top: -220px; right: -160px; opacity: .32; }
+  .orb-b { width: 480px; height: 480px; background: radial-gradient(circle, var(--wine), transparent 70%); bottom: -160px; left: -140px; opacity: .45; animation-delay: 5s; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(24px,30px) scale(1.06); } }
+
+  /* ── Slides ── */
+  .slide {
+    position: absolute; inset: 0; padding: 72px 96px 96px;
+    display: flex; flex-direction: column; opacity: 0; visibility: hidden;
+    transition: opacity .45s ease, visibility .45s;
+  }
+  .slide.active { opacity: 1; visibility: visible; }
+  .slide.active .rise { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.active .rise:nth-child(2) { animation-delay: .06s; }
+  .slide.active .rise:nth-child(3) { animation-delay: .12s; }
+  .slide.active .rise:nth-child(4) { animation-delay: .18s; }
+  @keyframes rise { from { transform: translateY(14px); opacity: .0; } to { transform: none; opacity: 1; } }
+
+  .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 56px; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-badge { background: var(--red); color: #fff; font-weight: 700; font-size: 15px; letter-spacing: .1em; padding: 6px 10px; border-radius: 5px; }
+  .logo-word { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .logo-word b { color: var(--red); font-weight: 700; }
+  .section-tag { font-family: var(--mono); font-size: 14px; color: var(--fg-3); letter-spacing: .12em; text-transform: uppercase; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
+    background: rgba(229,9,20,0.12); border: 1px solid var(--line-red); border-radius: 100px;
+    padding: 8px 18px; font-size: 14px; font-weight: 500; color: var(--red-soft);
+    letter-spacing: .08em; text-transform: uppercase; margin-bottom: 28px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(.8); } }
+
+  h1, h2 { margin: 0; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; text-wrap: balance; text-transform: uppercase; }
+  h1 { font-size: 112px; }
+  h2 { font-size: 64px; max-width: 1180px; }
+  .grad { background: linear-gradient(135deg, var(--red) 0%, var(--red-soft) 60%, #FF9999 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .lead { font-size: 24px; line-height: 1.55; color: var(--fg-2); max-width: 760px; margin: 28px 0 0; font-weight: 400; }
+  .body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+  .glass { background: rgba(255,255,255,0.025); border: 1px solid var(--line); border-radius: 14px; backdrop-filter: blur(12px); }
+
+  /* S1 capa */
+  .cover { justify-content: center; }
+  .cover h1 { font-size: 132px; }
+  .cover .meta { display: flex; gap: 0; margin-top: 64px; align-self: flex-start; }
+  .cover .meta div { padding: 22px 40px; border-right: 1px solid var(--line); }
+  .cover .meta div:last-child { border-right: none; }
+  .num { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .lbl { font-size: 13px; color: var(--fg-3); letter-spacing: .08em; text-transform: uppercase; margin-top: 10px; }
+  .marquee { position: absolute; left: 0; right: 0; bottom: 0; border-top: 1px solid var(--line); padding: 20px 0; overflow: hidden; white-space: nowrap; font-weight: 700; font-size: 18px; letter-spacing: .14em; color: var(--fg-3); }
+  .marquee span { display: inline-block; animation: slide 40s linear infinite; }
+  .marquee i { color: var(--red); font-style: normal; margin: 0 26px; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  /* S2 dor */
+  .pains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 52px; }
+  .pain { padding: 32px; display: flex; flex-direction: column; gap: 18px; }
+  .pain h3 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em; }
+  .pain .who { font-family: var(--mono); font-size: 13px; color: var(--red-soft); letter-spacing: .1em; text-transform: uppercase; }
+  .pain ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .pain li { font-size: 18px; line-height: 1.45; color: var(--fg-2); padding-left: 22px; position: relative; }
+  .pain li::before { content: "✕"; position: absolute; left: 0; color: var(--red); font-size: 13px; top: 4px; }
+
+  /* S3 custo */
+  .split { display: grid; grid-template-columns: 1.05fr 1fr; gap: 72px; flex: 1; align-items: center; }
+  .quote { font-size: 46px; font-weight: 300; line-height: 1.22; letter-spacing: -0.02em; margin: 0; }
+  .quote b { font-weight: 700; color: var(--red-soft); }
+  .quote-src { margin-top: 28px; font-family: var(--mono); font-size: 14px; color: var(--fg-3); letter-spacing: .1em; text-transform: uppercase; }
+  .costs { display: flex; flex-direction: column; }
+  .cost { display: grid; grid-template-columns: 56px 1fr; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--line); align-items: start; }
+  .cost:first-child { border-top: 1px solid var(--line); }
+  .cost .k { font-family: var(--mono); font-size: 15px; color: var(--red); padding-top: 4px; }
+  .cost h4 { margin: 0 0 6px; font-size: 22px; font-weight: 600; }
+  .cost p { margin: 0; font-size: 17px; line-height: 1.5; color: var(--fg-2); }
+
+  /* S4 ponto de encontro */
+  .meet { display: grid; grid-template-columns: 1fr 360px 1fr; gap: 0; align-items: center; margin-top: 64px; }
+  .side { padding: 40px; }
+  .side .who { font-family: var(--mono); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3); }
+  .side h3 { margin: 12px 0 18px; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
+  .side p { margin: 0; font-size: 19px; line-height: 1.55; color: var(--fg-2); }
+  .hub { position: relative; height: 360px; display: grid; place-items: center; }
+  .hub::before, .hub::after { content: ""; position: absolute; top: 50%; height: 2px; width: 50%; background: linear-gradient(90deg, transparent, var(--red)); }
+  .hub::before { left: -10%; }
+  .hub::after { right: -10%; transform: scaleX(-1); }
+  .hub-core { width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(229,9,20,.55), rgba(123,10,20,.35) 55%, rgba(17,17,17,.9) 80%); border: 1px solid var(--line-red); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; position: relative; z-index: 1; box-shadow: 0 0 80px rgba(229,9,20,.35); }
+  .hub-core .logo-word { font-size: 24px; }
+  .hub-core small { font-size: 14px; color: var(--fg-2); max-width: 180px; line-height: 1.4; }
+  .side.right { text-align: right; }
+  .plus { margin-top: 44px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: rgba(255,255,255,0.04); border-radius: 100px; padding: 10px 18px; font-size: 16px; color: var(--fg-2); }
+  .chip b { color: var(--fg); font-weight: 600; }
+
+  /* S5 formatos */
+  .formats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 52px; }
+  .fmt { padding: 28px 24px 30px; display: flex; flex-direction: column; gap: 16px; min-height: 270px; }
+  .fmt .ico { width: 52px; height: 52px; border-radius: 12px; background: rgba(229,9,20,.14); border: 1px solid var(--line-red); display: grid; place-items: center; }
+  .fmt .ico svg { width: 26px; height: 26px; stroke: var(--red-soft); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fmt h3 { margin: 0; font-size: 22px; font-weight: 600; }
+  .fmt p { margin: 0; font-size: 16px; line-height: 1.5; color: var(--fg-2); }
+  .strip { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .strip > div { padding: 24px 32px; border-right: 1px solid var(--line); }
+  .strip > div:last-child { border-right: none; }
+  .strip h4 { margin: 0 0 6px; font-size: 19px; font-weight: 600; }
+  .strip p { margin: 0; font-size: 16px; color: var(--fg-2); line-height: 1.45; }
+
+  /* S6 fluxo */
+  .flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; margin-top: 64px; position: relative; }
+  .flow::before { content: ""; position: absolute; top: 27px; left: 28px; right: 28px; height: 2px; background: linear-gradient(90deg, var(--red), rgba(229,9,20,.15)); }
+  .step { padding-right: 24px; position: relative; }
+  .step .n { width: 56px; height: 56px; border-radius: 50%; background: var(--bg); border: 2px solid var(--red); display: grid; place-items: center; font-family: var(--mono); font-size: 17px; font-weight: 500; color: var(--fg); position: relative; z-index: 1; }
+  .step:first-child .n { background: var(--red); }
+  .step h3 { margin: 28px 0 10px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .step p { margin: 0; font-size: 16px; line-height: 1.5; color: var(--fg-2); }
+  .step .tagline { display: inline-block; margin-top: 14px; font-family: var(--mono); font-size: 13px; color: var(--red-soft); letter-spacing: .06em; }
+  .entry { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .entry > div { padding: 24px 30px; display: flex; gap: 20px; align-items: baseline; }
+  .entry .who { font-family: var(--mono); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--red-soft); white-space: nowrap; }
+  .entry p { margin: 0; font-size: 17px; line-height: 1.5; color: var(--fg-2); }
+
+  /* S7 plataforma (mock) */
+  .platform { display: grid; grid-template-columns: 1fr 1.55fr; gap: 64px; flex: 1; align-items: center; }
+  .mods { display: flex; flex-direction: column; gap: 4px; margin-top: 36px; }
+  .mod { display: grid; grid-template-columns: 150px 1fr; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .mod b { font-size: 18px; font-weight: 600; }
+  .mod span { font-size: 16px; color: var(--fg-2); line-height: 1.45; }
+  .app { background: var(--card); border: 1px solid var(--line-red); border-radius: 16px; overflow: hidden; box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(229,9,20,.08); display: grid; grid-template-columns: 190px 1fr; height: 560px; }
+  .app-nav { border-right: 1px solid var(--line); padding: 22px 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(255,255,255,.015); }
+  .app-nav .logo { margin: 0 8px 22px; }
+  .app-nav .logo-badge { font-size: 11px; padding: 4px 7px; }
+  .app-nav .logo-word { font-size: 15px; }
+  .app-nav a { font-size: 14px; color: var(--fg-2); padding: 10px 12px; border-radius: 8px; text-decoration: none; display: flex; justify-content: space-between; }
+  .app-nav a.on { background: rgba(229,9,20,.14); color: var(--fg); }
+  .app-nav a em { font-style: normal; font-family: var(--mono); font-size: 12px; background: var(--red); color: #fff; border-radius: 10px; padding: 1px 7px; }
+  .app-main { padding: 26px 28px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .app-h { display: flex; justify-content: space-between; align-items: baseline; }
+  .app-h h5 { margin: 0; font-size: 20px; font-weight: 600; }
+  .app-h span { font-family: var(--mono); font-size: 12px; color: var(--fg-3); }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .kpi { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .kpi .v { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .kpi .v.red { color: var(--red-soft); }
+  .kpi .t { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: .07em; margin-top: 6px; }
+  .rows { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .row { display: grid; grid-template-columns: 1.6fr 1fr .9fr; gap: 12px; padding: 13px 16px; font-size: 14px; border-bottom: 1px solid var(--line); align-items: center; }
+  .row:last-child { border-bottom: none; }
+  .row.head { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: .08em; background: rgba(255,255,255,.02); }
+  .row .muted { color: var(--fg-2); }
+  .pill { justify-self: start; font-size: 12px; padding: 3px 10px; border-radius: 100px; border: 1px solid; }
+  .pill.r { color: var(--red-soft); border-color: var(--line-red); background: rgba(229,9,20,.1); }
+  .pill.g { color: #7FD4A0; border-color: rgba(127,212,160,.3); background: rgba(127,212,160,.08); }
+  .pill.n { color: var(--fg-2); border-color: var(--line); }
+  .example { font-family: var(--mono); font-size: 11px; color: var(--fg-3); letter-spacing: .08em; text-transform: uppercase; }
+
+  /* S8 performance */
+  .perf { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; flex: 1; margin-top: 48px; }
+  .model { padding: 36px 40px; display: flex; flex-direction: column; gap: 26px; }
+  .model h3 { margin: 0; font-size: 26px; font-weight: 600; }
+  .bar { display: flex; height: 76px; border-radius: 10px; overflow: hidden; }
+  .bar .floor { flex: 3; background: rgba(255,255,255,.08); display: flex; flex-direction: column; justify-content: center; padding: 0 22px; }
+  .bar .bonus { flex: 2; background: linear-gradient(135deg, var(--red), var(--wine)); display: flex; flex-direction: column; justify-content: center; padding: 0 22px; }
+  .bar b { font-size: 18px; } .bar small { font-size: 13px; color: var(--fg-2); }
+  .bar .bonus small { color: rgba(255,255,255,.8); }
+  .model p { margin: 0; font-size: 18px; line-height: 1.55; color: var(--fg-2); }
+  .model .note { font-family: var(--mono); font-size: 14px; color: var(--red-soft); }
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: start; }
+  .metric { padding: 26px 28px; }
+  .metric .mk { font-family: var(--mono); font-size: 13px; color: var(--fg-3); letter-spacing: .12em; text-transform: uppercase; }
+  .metric h4 { margin: 10px 0 8px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .metric p { margin: 0; font-size: 16px; line-height: 1.45; color: var(--fg-2); }
+  .metric.wide { grid-column: span 2; display: flex; gap: 22px; align-items: center; border-color: var(--line-red); background: rgba(229,9,20,.06); }
+  .metric.wide p { color: var(--fg); font-size: 18px; }
+
+  /* S9 comparativo */
+  .cmp { margin-top: 48px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .cmp table { width: 100%; border-collapse: collapse; }
+  .cmp th, .cmp td { padding: 20px 24px; text-align: left; font-size: 18px; border-bottom: 1px solid var(--line); }
+  .cmp tr:last-child td { border-bottom: none; }
+  .cmp th { font-size: 14px; font-weight: 500; color: var(--fg-3); text-transform: uppercase; letter-spacing: .08em; background: rgba(255,255,255,.02); }
+  .cmp td:first-child { color: var(--fg); font-weight: 500; width: 30%; }
+  .cmp td { color: var(--fg-2); }
+  .cmp .us { background: rgba(229,9,20,.09); color: var(--fg); font-weight: 600; }
+  .cmp th.us { color: var(--red-soft); background: rgba(229,9,20,.14); }
+  .y::before { content: "●"; color: var(--red); margin-right: 10px; font-size: 13px; }
+  .no::before { content: "○"; color: var(--fg-3); margin-right: 10px; font-size: 13px; }
+
+  /* S10 CTA */
+  .cta { justify-content: center; }
+  .cta h2 { font-size: 92px; max-width: 1300px; }
+  .doors { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; max-width: 1240px; }
+  .door { padding: 34px 38px; display: flex; flex-direction: column; gap: 14px; }
+  .door.primary { background: var(--red); border-color: var(--red); box-shadow: 0 10px 40px rgba(229,9,20,.35); }
+  .door .who { font-family: var(--mono); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-2); }
+  .door.primary .who { color: rgba(255,255,255,.85); }
+  .door h3 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+  .door p { margin: 0; font-size: 18px; line-height: 1.5; color: var(--fg-2); }
+  .door.primary p { color: rgba(255,255,255,.88); }
+  .sign { margin-top: 52px; font-size: 20px; color: var(--fg-3); }
+  .sign b { color: var(--fg); font-weight: 600; }
+
+  /* footer & controls (inside stage) */
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 34px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--fg-3); z-index: 3; }
+  .foot .pg { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+  .foot .pg b { color: var(--fg); font-weight: 500; }
+  .progress { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--red); transition: width .45s ease; z-index: 4; }
+  .slide.cover-slide ~ .foot { }
+
+  .controls {
+    position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    display: flex; gap: 8px; z-index: 20;
+  }
+  .controls button {
+    width: 42px; height: 42px; border-radius: 8px; border: 1px solid var(--line); background: rgba(17,17,17,.85);
+    color: var(--fg); font-size: 18px; cursor: pointer; font-family: var(--font); backdrop-filter: blur(8px);
+    transition: background .15s, border-color .15s;
+  }
+  .controls button:hover { background: var(--red); border-color: var(--red); }
+  .controls button:focus-visible { outline: 2px solid var(--red-soft); outline-offset: 2px; }
+  .controls button:disabled { opacity: .35; cursor: default; background: rgba(17,17,17,.85); border-color: var(--line); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+
+</head>
+<body>
+<div class="viewport" id="viewport">
+  <div class="stage" id="stage">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+
+    <!-- 1 · CAPA -->
+    <section class="slide cover-slide" data-title="Capa">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body cover">
+        <span class="eyebrow rise"><span class="dot"></span>Creator Studio no V4MOS.AI</span>
+        <h1 class="rise">Criativos com<br><span class="grad">direção.</span></h1>
+        <p class="lead rise">O braço de criativos e influência da V4. Creators verificados, dados de performance e estratégia no mesmo lugar onde a sua marca já cresce.</p>
+      </div>
+      <div class="marquee" aria-hidden="true"><span>DESIGN<i>✳</i>VÍDEO<i>✳</i>COPY<i>✳</i>CREATOR PARA ADS<i>✳</i>CONTEÚDO ORGÂNICO<i>✳</i>PERFORMANCE<i>✳</i>DESIGN<i>✳</i>VÍDEO<i>✳</i>COPY<i>✳</i>CREATOR PARA ADS<i>✳</i>CONTEÚDO ORGÂNICO<i>✳</i>PERFORMANCE<i>✳</i></span></div>
+    </section>
+
+    <!-- 2 · REALIDADE ATUAL -->
+    <section class="slide" data-title="Realidade atual">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body">
+        <span class="eyebrow rise"><span class="dot"></span>Como as marcas contratam creators e criativos hoje</span>
+        <h2 class="rise">Três caminhos. <span class="grad">Nenhum entrega resultado.</span></h2>
+        <div class="pains rise">
+          <div class="pain glass">
+            <span class="who">Direto com o creator</span>
+            <h3>Muito esforço, pouca segurança</h3>
+            <ul>
+              <li>Prospecção e contrato consomem semanas</li>
+              <li>Briefing descumprido sem ter a quem recorrer</li>
+              <li>Cachê sem parâmetro de mercado</li>
+            </ul>
+          </div>
+          <div class="pain glass">
+            <span class="who">Via agência de influência</span>
+            <h3>Entrega a peça, não o resultado</h3>
+            <ul>
+              <li>Pacotes fechados, raramente no sucesso</li>
+              <li>Processo moroso de negociação</li>
+              <li>Sem otimização, análise ou estratégia</li>
+            </ul>
+          </div>
+          <div class="pain glass">
+            <span class="who">Processo interno</span>
+            <h3>Um analista e uma planilha</h3>
+            <ul>
+              <li>Gestão manual por WhatsApp e e-mail</li>
+              <li>Poucas propostas para testar criativos</li>
+              <li>Não escala junto com a demanda</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · O CUSTO -->
+    <section class="slide" data-title="O custo">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body split">
+        <div class="rise">
+          <p class="quote">Execução sem direção correta é apenas <b>velocidade no caminho errado.</b></p>
+          <div class="quote-src">A contratação de criativos ainda é um braço de entrega solto da estratégia.</div>
+        </div>
+        <div class="costs rise">
+          <div class="cost"><span class="k">01</span><div><h4>Paga pela peça, sem ver o dado</h4><p>Pós-campanha, o resultado depende do print que o creator decide enviar.</p></div></div>
+          <div class="cost"><span class="k">02</span><div><h4>Investe sem certeza de retorno</h4><p>Quando a campanha não performa, a falta de dados impede entender o porquê.</p></div></div>
+          <div class="cost"><span class="k">03</span><div><h4>Testa pouco porque recebe pouco</h4><p>Com um número limitado de propostas, não há volume para testar criativos.</p></div></div>
+          <div class="cost"><span class="k">04</span><div><h4>Otimiza partes isoladas</h4><p>Anúncio, post e CRM melhoram sozinhos, e o faturamento não acompanha.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · A SOLUÇÃO -->
+    <section class="slide" data-title="A solução">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body">
+        <span class="eyebrow rise"><span class="dot"></span>O ponto de encontro</span>
+        <h2 class="rise">De um lado, demanda. Do outro, talento. <span class="grad">No meio, estratégia.</span></h2>
+        <div class="meet rise">
+          <div class="side glass">
+            <span class="who">Sua marca</span>
+            <h3>Traz o que precisa criar</h3>
+            <p>Sobe o briefing, define o budget, aprova creators e peças. Tudo dentro do V4MOS.AI.</p>
+          </div>
+          <div class="hub">
+            <div class="hub-core">
+              <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+              <small>Conecta, acompanha e otimiza pelos números</small>
+            </div>
+          </div>
+          <div class="side glass right">
+            <span class="who">Creators verificados</span>
+            <h3>Trazem repertório e proposta</h3>
+            <p>Designers, videomakers, copywriters e criadores de conteúdo que se candidatam com portfólio.</p>
+          </div>
+        </div>
+        <div class="plus rise">
+          <span class="chip"><b>Dashboard</b> de performance</span>
+          <span class="chip"><b>Account V4</b> dedicado</span>
+          <span class="chip"><b>Milhares</b> de creators na base</span>
+          <span class="chip"><b>Inventário de mídia</b> com a audiência dos creators</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · FORMATOS -->
+    <section class="slide" data-title="Formatos">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body">
+        <span class="eyebrow rise"><span class="dot"></span>Todos os formatos, um só lugar</span>
+        <h2 class="rise">Da peça avulsa à <span class="grad">campanha com creator.</span></h2>
+        <div class="formats rise">
+          <div class="fmt glass"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div><h3>Arte estática</h3><p>Peças para feed, stories e anúncios.</p></div>
+          <div class="fmt glass"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 10l5-3v10l-5-3z"/></svg></div><h3>Vídeo</h3><p>Edição e produção audiovisual para performance.</p></div>
+          <div class="fmt glass"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div><h3>Copy</h3><p>Textos com intenção para anúncio e conteúdo.</p></div>
+          <div class="fmt glass"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 11l18-7-7 18-2-8z"/></svg></div><h3>Creator para ads</h3><p>Criativos UGC que rodam na sua conta de anúncio.</p></div>
+          <div class="fmt glass"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div><h3>Conteúdo orgânico</h3><p>Creators publicando para a própria audiência.</p></div>
+        </div>
+        <div class="strip glass rise">
+          <div><h4>Mesmo escopo para todos</h4><p>Todo cliente acessa todos os formatos, sem pacotes.</p></div>
+          <div><h4>Curadoria ativa</h4><p>O time aciona creators estratégicos quando o briefing pede.</p></div>
+          <div><h4>Criativos direto na conta</h4><p>Cada peça comprada vai para a sua conta de anúncio.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · COMO FUNCIONA -->
+    <section class="slide" data-title="Como funciona">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body">
+        <span class="eyebrow rise"><span class="dot"></span>Do aporte ao resultado</span>
+        <h2 class="rise">Seis passos. <span class="grad">Um ciclo que se repete melhor.</span></h2>
+        <div class="flow rise">
+          <div class="step"><div class="n">01</div><h3>Aporte na carteira</h3><p>Saldo pré-pago libera o Creator Studio no V4MOS.AI.</p></div>
+          <div class="step"><div class="n">02</div><h3>Alinhamento</h3><p>Estratégia definida com o seu account V4.</p></div>
+          <div class="step"><div class="n">03</div><h3>Briefing</h3><p>Uma ou várias peças, ou uma campanha com creator.</p></div>
+          <div class="step"><div class="n">04</div><h3>Propostas</h3><p>Creators se candidatam e você escolhe quem produz.</p><span class="tagline">meta: até 24h</span></div>
+          <div class="step"><div class="n">05</div><h3>Aprovação</h3><p>Aprovou a peça, o valor sai da carteira. Senão, pede ajuste.</p></div>
+          <div class="step"><div class="n">06</div><h3>Performance</h3><p>Dados atualizados todo dia e revisados com o account.</p><span class="tagline">via API, diário</span></div>
+        </div>
+        <div class="entry rise">
+          <div class="glass"><span class="who">Já é cliente V4</span><p>Faz o aporte na plataforma e começa a subir briefings.</p></div>
+          <div class="glass"><span class="who">Ainda não é V4</span><p>Entra pelo Creator Studio após call com o comercial, com aporte mínimo.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · A PLATAFORMA -->
+    <section class="slide" data-title="A plataforma">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body platform">
+        <div class="rise">
+          <span class="eyebrow"><span class="dot"></span>Tudo vive no dashboard</span>
+          <h2 style="font-size:56px">Saiba o que <span class="grad">pede sua decisão hoje.</span></h2>
+          <div class="mods">
+            <div class="mod"><b>Visão geral</b><span>Decisões pendentes e saldo atual.</span></div>
+            <div class="mod"><b>Briefings</b><span>Você escreve, a Operação V4 indica os creators certos.</span></div>
+            <div class="mod"><b>Decisões</b><span>Propostas a responder e entregas a avaliar.</span></div>
+            <div class="mod"><b>Contratos</b><span>Em aberto e encerrados. Só fecha quando você encerra.</span></div>
+            <div class="mod"><b>Criativos</b><span>Tudo o que você já comprou, pronto para a conta de anúncio.</span></div>
+            <div class="mod"><b>Saldo</b><span>Carteira pré-paga e extrato completo.</span></div>
+          </div>
+        </div>
+        <div class="app rise" aria-label="Ilustração da tela Visão geral com dados de exemplo">
+          <nav class="app-nav">
+            <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+            <a class="on">Visão geral</a>
+            <a>Briefings</a>
+            <a>Decisões <em>5</em></a>
+            <a>Contratos</a>
+            <a>Criativos</a>
+            <a>Saldo</a>
+          </nav>
+          <div class="app-main">
+            <div class="app-h"><h5>Visão geral</h5><span class="example">Dados ilustrativos</span></div>
+            <div class="kpis">
+              <div class="kpi"><div class="v red">5</div><div class="t">Exigem decisão</div></div>
+              <div class="kpi"><div class="v">2</div><div class="t">Entregas a avaliar</div></div>
+              <div class="kpi"><div class="v">4</div><div class="t">Contratos abertos</div></div>
+              <div class="kpi"><div class="v">R$ 18,4k</div><div class="t">Saldo atual</div></div>
+            </div>
+            <div class="rows">
+              <div class="row head"><span>Item</span><span>Briefing</span><span>Status</span></div>
+              <div class="row"><span>3 propostas recebidas</span><span class="muted">Vídeo UGC · lançamento</span><span class="pill r">Responder</span></div>
+              <div class="row"><span>Entrega de peça estática</span><span class="muted">Carrossel Black Friday</span><span class="pill r">Avaliar</span></div>
+              <div class="row"><span>Vídeo 30s aprovado</span><span class="muted">Remarketing</span><span class="pill g">Na conta de anúncio</span></div>
+              <div class="row"><span>Copy para anúncios</span><span class="muted">Captação de leads</span><span class="pill n">Em produção</span></div>
+              <div class="row"><span>Creator para orgânico</span><span class="muted">Awareness</span><span class="pill n">Aguardando propostas</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · PERFORMANCE -->
+    <section class="slide" data-title="Performance">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body">
+        <span class="eyebrow rise"><span class="dot"></span>Pague pelo que gera resultado</span>
+        <h2 class="rise">Sem print. <span class="grad">Com dado.</span></h2>
+        <div class="perf rise">
+          <div class="model glass">
+            <h3>Piso fixo + bônus por performance</h3>
+            <div class="bar">
+              <div class="floor"><b>Piso fixo</b><small>Valor acordado da peça</small></div>
+              <div class="bonus"><b>Bônus</b><small>CPM / CPMQL</small></div>
+            </div>
+            <p>O orçamento vai para o que performa, e o creator tem motivo para entregar acima da média. O preço se ajusta por oferta e demanda dentro da plataforma: você define o valor e calibra o budget pela resposta dos creators.</p>
+            <span class="note">Bônus apurado 30 dias após o início da veiculação</span>
+          </div>
+          <div class="metrics">
+            <div class="metric glass"><span class="mk">Alcance</span><h4>Impressões reais</h4><p>Medidas por criativo, direto da conta de anúncio.</p></div>
+            <div class="metric glass"><span class="mk">Conversão</span><h4>Leads e vendas</h4><p>O que cada peça trouxe de volta.</p></div>
+            <div class="metric glass"><span class="mk">Engajamento</span><h4>Resposta do público</h4><p>Para saber qual linguagem funciona.</p></div>
+            <div class="metric glass"><span class="mk">Retorno</span><h4>ROI e ROAS</h4><p>Para decidir onde colocar o próximo real.</p></div>
+            <div class="metric glass wide"><span class="mk">Account V4</span><p>Os números são lidos com o seu account, que sugere a próxima rodada de otimização.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · COMPARATIVO -->
+    <section class="slide" data-title="Comparativo">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body">
+        <span class="eyebrow rise"><span class="dot"></span>Lado a lado</span>
+        <h2 class="rise">Outras opções resolvem a entrega. <span class="grad">Nós resolvemos o resultado.</span></h2>
+        <div class="cmp rise">
+          <table>
+            <thead>
+              <tr><th></th><th>Agência de influência</th><th>Processo interno</th><th>Plataforma genérica</th><th class="us">Creator Studio</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Dados de performance por peça</td><td class="no">Raramente</td><td class="no">Manual</td><td class="no">Parcial</td><td class="us y">Diário, via API</td></tr>
+              <tr><td>Pagamento ligado ao resultado</td><td class="no">Pacote fechado</td><td class="no">Negociação a negociação</td><td class="no">Não</td><td class="us y">Piso + bônus</td></tr>
+              <tr><td>Volume de propostas para testar</td><td class="no">Limitado</td><td class="no">Baixo</td><td class="y">Alto</td><td class="us y">Base em crescimento diário</td></tr>
+              <tr><td>Integração com a estratégia</td><td class="no">Não</td><td class="no">Depende do time</td><td class="no">Não</td><td class="us y">Junto aos serviços V4</td></tr>
+              <tr><td>Acompanhamento estratégico</td><td class="no">Só entrega</td><td class="no">Analista sobrecarregado</td><td class="no">Self-service</td><td class="us y">Account dedicado</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · PRÓXIMOS PASSOS -->
+    <section class="slide" data-title="Próximos passos">
+      <div class="top">
+        <div class="logo"><span class="logo-badge">V4</span><span class="logo-word">creatorstudio<b>.</b></span></div>
+      </div>
+      <div class="body cta">
+        <span class="eyebrow rise"><span class="dot"></span>Comece pelo próximo briefing</span>
+        <h2 class="rise">Seu próximo criativo já pode <span class="grad">nascer com dado.</span></h2>
+        <div class="doors rise">
+          <div class="door glass primary">
+            <span class="who">Já sou cliente V4</span>
+            <h3>Ative no V4MOS.AI</h3>
+            <p>Faça o aporte na carteira, alinhe a estratégia com seu account e suba o primeiro briefing.</p>
+          </div>
+          <div class="door glass">
+            <span class="who">Ainda não sou V4</span>
+            <h3>Fale com o comercial</h3>
+            <p>Use o Creator Studio como porta de entrada para o ecossistema V4, com aporte mínimo.</p>
+          </div>
+        </div>
+        <p class="sign rise">O talento é dos creators. <b>A direção é V4.</b></p>
+      </div>
+    </section>
+
+    <div class="foot"><span>V4 Company · Creator Studio</span><span class="pg" id="pg"><b>01</b> / 10</span></div>
+    <div class="progress" id="progress"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="prev" aria-label="Slide anterior">←</button>
+  <button id="next" aria-label="Próximo slide">→</button>
+</div>
+
+<script>
+(function () {
+  const stage = document.getElementById('stage');
+  const slides = Array.from(stage.querySelectorAll('.slide'));
+  const pg = document.getElementById('pg');
+  const bar = document.getElementById('progress');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const total = slides.length;
+  let i = 0;
+
+  function fit() {
+    const pad = window.innerWidth < 700 ? 8 : 32;
+    const w = window.innerWidth - pad * 2, h = window.innerHeight - pad * 2 - (window.innerWidth < 700 ? 56 : 0);
+    const s = Math.min(w / 1600, h / 900);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+
+  function show(n) {
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    pg.innerHTML = '<b>' + String(i + 1).padStart(2, '0') + '</b> / ' + String(total).padStart(2, '0');
+    bar.style.width = ((i + 1) / total * 100) + '%';
+    prev.disabled = i === 0;
+    next.disabled = i === total - 1;
+    const h = '#s' + (i + 1);
+    if (location.hash !== h) { try { history.replaceState(null, '', h); } catch (e) {} }
+  }
+
+  function fromHash() {
+    const m = /^#s(\d+)$/.exec(location.hash);
+    return m ? parseInt(m[1], 10) - 1 : 0;
+  }
+
+  prev.addEventListener('click', () => show(i - 1));
+  next.addEventListener('click', () => show(i + 1));
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(total - 1);
+  });
+  let tx = null;
+  document.addEventListener('touchstart', (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1));
+    tx = null;
+  });
+  window.addEventListener('hashchange', () => show(fromHash()));
+  window.addEventListener('resize', fit);
+  fit();
+  show(fromHash());
+})();
+</script>
+
+</body>
+</html>
